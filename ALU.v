@@ -84,18 +84,34 @@ module alu(
       result[1:0] =comresult;  
     end
     if(op == 6'b001000) begin  
-      result = ~a;  
+      for(i = 0; i < 8; i++)begin
+        result[i] = ~a[i];
+      end
     end
     if(op == 6'b001001) begin  
-      result = a&b;  
+      for(i = 0; i < 8; i++)begin
+        result[i] = a[i]&b[i];
+      end
     end
     if(op == 6'b001010) begin  
-      result = a|b;  
+      for(i = 0; i < 8; i++)begin
+        result[i] = a[i]|b[i];
+      end 
     end
     if(op == 6'b001011) begin  
-      result = a^b;  
+      for(i = 0; i < 8; i++)begin
+        result[i] = a[i]^b[i];
+      end
     end
     if(op == 6'b010000) begin  
+      for(i = 0; i < 8-b; i++)begin
+        result[i+b] = a[i];
+      end
+    end
+    if(op == 6'b010001) begin  
+      for(i = b; i < 8; i++)begin
+        result[i-b] = a[i];
+      end
     end
 
   end

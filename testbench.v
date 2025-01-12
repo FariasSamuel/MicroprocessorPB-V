@@ -12,7 +12,7 @@ module testbench;
   // Test sequence
   initial begin
     enable = 0;
-    file = $fopen("note.txt", "r");
+    file = $fopen("bytecode.bin", "r");
     if (file) begin
       while (!$feof(file)) begin
         code = $fscanf(file, "%b", t);
