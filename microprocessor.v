@@ -12,16 +12,19 @@ integer file,code,t;
   reg clk;
   wire fusion_enable = enable & enable_clk;
   integer line = 0;
+  
   alu ALU (
     .a(ar1),
     .b(ar2),
     .op(operation_alu),
     .result(arr)
   );
+
   clock_gen CLOCK_GEN(.enable(fusion_enable),.clk(clk));
 
     assign running = enable_clk;
    assign result = arr;
+
   always@(posedge clk)begin
     if(line == -1)begin
         assign enable_clk = 0;
