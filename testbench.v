@@ -23,8 +23,7 @@ module testbench;
     end
     memory[i] = 8'b11111111;
     #5enable = 1;
-    $monitor("%b %b %b",result, a,b);
-    #200 $finish;
+    #1000 $finish;
   end
 endmodule
 

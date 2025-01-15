@@ -13,67 +13,79 @@ integer file,code,t;
   reg [7:0] memoria[1023:0]; 
   reg enable_clk = 1;
   reg clk;
+  reg busy;
   wire fusion_enable = enable & enable_clk;
   integer line = 0;
   alu ALU (
-    .a(ar1),
-    .b(ar2),
+    .a(memoria[0]),
+    .b(memoria[1]),
     .op(operation_alu),
-    .result(arr)
+    .clk(clk),
+    .result(arr),
+    .busy(busy)
   );
   clock_gen CLOCK_GEN(.enable(fusion_enable),.clk(clk));
 
   assign running = enable_clk;
-  assign a = ar1;
-  assign b = ar2;
+  assign a = memoria[0];
+  assign b = memoria[1];
   always@(posedge clk)begin
     if(line == -1)begin
         assign enable_clk = 0;
         $finish;
     end else begin
+        $display("%b",busy);
+        if(!busy)begin
         reader = memory[line];
         case(reader)
             8'b00000010:
             begin
                 line = line + 1;
                 operation_alu = memory[line];
+                //$display("%b",operation_alu);
                 line = line + 1;
-                ar1 = memory[line];
+                memoria[0] = memory[line];
+                //$display("%b",memoria[0]);
                 line = line + 1;
-                ar2 = memory[line];
-                result = arr;
+                memoria[1] = memory[line];
+                //$display("%b",memoria[1]);
+                memoria[2] = arr;
+                result = memoria[2];
+                //#5$display("%b",busy);
             end
             8'b11000010:
             begin
                 line = line + 1;
-                ar1 = memory[line];
+                memoria[0] = memory[line];
                 line = line + 1;
-                ar2 = memory[line];
-                memoria[ar1] = ar2;
-               
-                result = memoria[ar1];
+                memoria[1] = memory[line];
+                memoria[memoria[0]] = memoria[1];
+                result = memoria[memoria[0]];
             end
             8'b00000001:
             begin
                 line = line + 1;
                 operation_alu = memory[line];
                 line = line + 1;
-                ar1 = memory[line];
-                result = arr;
+                memoria[0] = memory[line];
+                memoria[2] = arr;
+                result = memoria[2];
             end
             8'b10000001:
             begin
                 line = line + 1;
-                ar1 = memory[line];
-                ar2 = ar1;
-                result = memoria[ar1];
+                memoria[0] = memory[line];
+                memoria[1] = memoria[0];
+                result = memoria[memoria[0]];
             end
             8'b11111111:
             begin
                 line = -2;
             end
         endcase
+        #1$display("%b %b %b %b",result,operation_alu,a,b);
         line = line + 1;
+        end
     end
   end
 endmodule
