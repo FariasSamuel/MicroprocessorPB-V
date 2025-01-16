@@ -2,8 +2,24 @@
 #include <fstream>
 #include <map>
 #include <vector>
-
+#include <bits/stdc++.h>
 using namespace std;
+
+string DecimalToBinary(int num)
+{
+    string str;
+    int b = 0;
+    while(b < 8){
+      if(num & 1) // 1
+        str+='1';
+      else // 0
+        str+='0';
+      num>>=1; // Right Shift by 1  
+      b++;
+    }   
+    reverse(str.begin(),str.end()); 
+    return str;
+}
 
 int main(){
     ifstream sourcecode("code.asm");
@@ -32,6 +48,7 @@ int main(){
         line = code[i];
         if(isalpha(line[0])){
             if(instructions.find(line) != instructions.end()){
+                if(instructions[line].second.first == 1){
                 if(instructions[line].second.second == 1){
                     assembly.write("00000001\n",9);
                 }else if (instructions[line].second.second == 2){
@@ -42,6 +59,7 @@ int main(){
                         cout << "Missing a parameter " << i << endl;
                     }
                 }
+                }
                 assembly.write((instructions[line].first.c_str()),instructions[line].first.length());
                 assembly.write("\n",1);
             }else{
@@ -49,7 +67,8 @@ int main(){
                 return 0; 
             }
         }else{
-            assembly.write((line.c_str()),line.length());
+            string aux = DecimalToBinary(stoi(line));
+            assembly.write((aux.c_str()),aux.length());
             assembly.write("\n",1);
         }
     }

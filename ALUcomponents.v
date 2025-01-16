@@ -178,6 +178,7 @@ module div_restoring (a, b, start, clk, clrn, q, r, busy, ready, count);
         reg_r <= mux_out; // perform restoring division
         count <= count + 5'b1;
         if (count == 5'b11111) begin // completed
+          $display("%d",reg_q);
           busy <= 0;
           ready <= 1; // q, r ready
         end
