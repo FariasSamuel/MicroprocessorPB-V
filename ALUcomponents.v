@@ -189,20 +189,23 @@ endmodule
 
 
 
-module compare(a,b,result);
+module compare(a,b,op,result);
   input [7:0] a,b;
+  input [7:0] op;
   output reg [1:0] result;
   
   wire [7:0] dif;
 
   sub SUB(.a(a),.b(b),.result(dif));
   always @(*)begin
-    if(dif == 8'b0)begin
-    result = 2'b00;
-    end else if(dif[7])begin
-      result = 2'b01;
+    if(dif == 8'b0 && op == 6'b000101)begin
+    result = 1;
+    end else if(dif[7] && op == 6'b000100)begin
+      result = 1;
+    end else if(dif != 8'b0 && !dif[7] && op == 6'b000110)begin
+      result = 1;
     end else begin
-      result = 2'b10;
+      result = 0;
     end
   end
 endmodule;

@@ -42,6 +42,7 @@ module alu(
   compare COMPARE (
     .a(a),
     .b(b),
+    .op(op),
     .result(comresult)
   );
 
@@ -56,7 +57,9 @@ module alu(
       8'b00000010: result = mulresult; // Multiplicação
       8'b00000011: result = a/b; // Divisão (8 bits do quociente)
       8'b00010011: result = a%b;
-      8'b00000100: result[1:0] = comresult; // Comparação
+      8'b00000100: result[1:0] = comresult;
+      8'b00000101: result[1:0] = comresult;
+      8'b00000110: result[1:0] = comresult; 
       8'b00001000: result = ~a;             // NOT bit a bit
       8'b00001001: result = a & b;          // AND bit a bit
       8'b00001010: result = a | b;          // OR bit a bit
