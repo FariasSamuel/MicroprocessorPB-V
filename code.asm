@@ -3,7 +3,7 @@ MOVAD
 2
 MOV
 1
-3
+4
 /comentario
 MOV
 3
@@ -49,17 +49,6 @@ MOV
 3
 PRINT
 2
-LEFT
-4
-2
-PRINT
-2
-/comentario
-RIGHT
-4
-2
-PRINT
-2
 RET
 JUMPZ
 GREATER
@@ -73,3 +62,6 @@ SUB
 7
 PRINT
 2
+PRINTBIT
+8
+3

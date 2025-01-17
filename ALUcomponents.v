@@ -134,21 +134,21 @@ module multiplier(a,b,result);
 endmodule
 
 module div_restoring (a, b, start, clk, clrn, q, r, busy, ready, count);
-  input [31:0] a;   // dividend
-  input [15:0] b;   // divisor
-  input start;      // start
-  input clk, clrn;  // clock and reset
-  output [31:0] q;  // quotient
-  output [15:0] r;  // remainder
-  output reg busy;  // busy
-  output reg ready; // ready
-  output reg [4:0] count; // counter
+  input [31:0] a;   
+  input [15:0] b;   
+  input start;      
+  input clk, clrn; 
+  output [31:0] q;  
+  output [15:0] r;  
+  output reg busy;  
+  output reg ready; 
+  output reg [4:0] count; 
 
   reg [31:0] reg_q;
   reg [15:0] reg_r;
   reg [15:0] reg_b;
 
-  wire [16:0] sub_out = {reg_r, reg_q[31]} - {1'b0, reg_b}; // subtraction
+  wire [16:0] sub_out = {reg_r, reg_q[31]} - {1'b0, reg_b}; 
   wire [15:0] mux_out = sub_out[16] ? {reg_r[14:0], reg_q[31]} : sub_out[15:0];
 
   assign q = reg_q;
@@ -167,20 +167,20 @@ module div_restoring (a, b, start, clk, clrn, q, r, busy, ready, count);
     end else begin
       if (start) begin
         $display("inicio");
-        reg_q <= a;     // load dividend
-        reg_b <= b;     // load divisor
+        reg_q <= a;     
+        reg_b <= b;     
         reg_r <= 0;
         busy <= 1;
         ready <= 0;
         count <= 0;
       end else if (busy) begin
         reg_q <= {reg_q[30:0], ~sub_out[16]};
-        reg_r <= mux_out; // perform restoring division
+        reg_r <= mux_out;
         count <= count + 5'b1;
-        if (count == 5'b11111) begin // completed
+        if (count == 5'b11111) begin 
           $display("%d",reg_q);
           busy <= 0;
-          ready <= 1; // q, r ready
+          ready <= 1; 
         end
       end
     end

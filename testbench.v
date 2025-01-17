@@ -1,16 +1,13 @@
 module testbench;
   integer file,code;
   integer i = 0;
-  reg [1023:0] [7:0]memory;
+  reg [7:0] memory[1023:0];
   reg [7:0] t;
-  reg [7:0] result;
-  reg [7:0] a,b;
-  reg enable;
-  reg running;
-  // Instantiate the ALU module
-  microprocessor MICROPROCESSOR(memory,enable,result,a,b);
 
-  // Test sequence
+  reg enable;
+
+  microprocessor MICROPROCESSOR(memory,enable);
+
   initial begin
     enable = 0;
     file = $fopen("bytecode.bin", "r");
@@ -23,7 +20,7 @@ module testbench;
     end
     memory[i] = 8'b11111111;
     #5enable = 1;
-    #1000 $finish;
+    //#1000 $finish;
   end
 endmodule
 
