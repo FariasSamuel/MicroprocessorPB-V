@@ -72,92 +72,154 @@ int main()
     int n = 1; // Contador que acompanha a linha do código lida
     while (sourcecode >> line) // Lê cada linha do código-fonte
     {
-        // Se a linha possuir uma barra (indicativo de comentário)
+        // Se a linha possuir uma barra no início (indicativo de comentário)
         if (line[0] != '/')
         {
             code.push_back(line); // Adiciona a linha ao vetor do código reescrito em binário
-            comments.push_back(comments[n-1]); // Adiciona ao vetor de comentários o comentário atual
-        } else{ // Caso não
-            comments.push_back(comments[n-1]+1);
+            comments.push_back(comments[n-1]); // #
+        } else { // #
+            comments.push_back(comments[n-1]+1); // #
         }
         n++; // Atualiza o contador
     }
 
+    // * Loop que percorre todo o código
     for (int i = 0; i < code.size(); i++)
     {
-        line = code[i];
-        if (isalpha(line[0]))
+        line = code[i]; // Linha atual
+
+        // Veja se é uma instrução (identificado pelo primeiro caractere caso seja uma letra)
+        if (isalpha(line[0])) 
         {
+            // Caso sim, veja se ela existe no dicionário
             if (instructions.find(line) != instructions.end())
             {
+                // * Checagem do tipo de função por meio do acesso aos pares
+                // Se for 1, adicione antes do opcode o número de parâmetros (Somente as funções que vão pra ALU)
                 if (instructions[line].second.first == 1)
                 {
+                    // Verifica se a função precisa de 1 parâmetro
                     if (instructions[line].second.second == 1)
                     {
+                        // Escreve o equivalente no arquivo de saída
                         assembly.write("00000001\n", 9);
                     }
+                    // Verifica se a função precisa de 2 parâmetros
                     else if (instructions[line].second.second == 2)
                     {
+                        // Escreve o equivalente no arquivo de saída
                         assembly.write("00000010\n", 9);
                     }
                 }
-                if(line == "JUMPZ"){
-                    int k = i+ 3;
-                    assembly.write("00000010\n", 9);
-                    if(code[i+1] != "GREATER" && code[i+1] != "EQUAL" && code[i+1] != "LESS"){
-                        cout << "invalid syntax line " << i+1 << " JUMPZ require a compare operator\n"; 
+
+                // * Tratamento da instrução JUMPZ
+                // Se a linha lida for relativa a instrução do opcode JUMPZ (altera o fluxo do código com base em uma comparação)
+                if (line == "JUMPZ"){
+                    int k = i + 3; // Define um contador que indica a próxima função ao JUMPZ
+                    assembly.write("00000010\n", 9); // Escreve na saída a indicação do tipo e parâmetro da função que vai ser relida
+                    // Se a próxima linha do código não for um operador comparativo
+                    if (code[i + 1] != "GREATER" && code[i + 1] != "EQUAL" && code[i + 1] != "LESS"){
+                        // Será inválido, pois a função precisa de um operador de comparação para saber se vai pular#
+                        // Imprime a mensagem de erro e indica a linha
+                        cout << "Invalid syntax line " << i + 1 << "JUMPZ require a compare operator\n"; 
                     }
-                    assembly.write((instructions[code[i+1]].first.c_str()), instructions[code[i+1]].first.length());
+                    // Escreva na saída: a instrução referente ao código JUMPZ em um vetor de caracteres e o seu tamanho#
+                    assembly.write((instructions[code[i + 1]].first.c_str()), instructions[code[i + 1]].first.length());
+                    // #
                     assembly.write("\n", 1);
-                    for(i = i+2; i <= k;i++){
-                        if(isalpha(code[i][0])){
+
+                    // #
+                    for (i = i + 2; i <= k; i++){
+                        if (isalpha(code[i][0])){
                             cout << "Missing a parameter " << i << " " << code[i] << endl;
                         }
                         string aux = DecimalToBinary(stoi(code[i]));
                         assembly.write((aux.c_str()), aux.length());
                         assembly.write("\n", 1);
                     }
-                }else{
-                    if(instructions[line].second.second > 0){
+
+                // * Checagem do número de parâmetros e tratamento das outras funções
+                } else {
+                    // Se a o número de parâmetros da função lida for maior que zero
+                    if (instructions[line].second.second > 0){
+                    // Faça um laço que percorre de 1 até a quantidade indicada de parâmetros
                     for (int j = 1; j <= instructions[line].second.second; j++)
                     {
+                        // Verifica se o parâmetro começa com uma letra, caso sim, significa que a quantidade de
+                        // parâmetros não foi atingida e um novo comando foi iniciado prematuramente
                         if (isalpha(code[i + j][0]))
                         {
+                            // Imprime a mensagem de erro
                             cout << "Missing a parameter " << i << " " << line << endl;
                         }
                     }
                     }
                 }
+                // Escreve na saída a função correspondente em um vetor de caracteres e o tamanho desse vetor
                 assembly.write((instructions[line].first.c_str()), instructions[line].first.length());
+                // O que significa esse "1"#
                 assembly.write("\n", 1);
-                if(line == "JUMPZ"){
-                    if(isalpha(code[i][0])){
+
+                // * Lógica do JUMPZ
+                // Caso a linha analisada seja uma instrução de desvio condicional
+                if (line == "JUMPZ"){
+                    // Verifique se o primeiro caractere da linha lida é uma letra
+                    if (isalpha(code[i][0])){
+                        // Caso seja, outro código foi começado prematuramente e falta parâmetros
+                        // Imprima a mensagem indicativa
                         cout << "Missing a parameter " << i << " " << code[i] << endl;
                     }
-                    string aux = DecimalToBinary(stoi(code[i])-comments[stoi(code[i])]-1);
+
+                    // Transforma um número de decimal para binário
+                    // Nesse caso é feito o cálculo do endereço de desvio, onde o resultado é:
+                    // #
+                    string aux = DecimalToBinary(stoi(code[i]) - comments[stoi(code[i])] - 1);
+                    // Escreve na saída os números em formato de vetor de char e o tamanho do vetor#
                     assembly.write((aux.c_str()), aux.length());
+                    // #
                     assembly.write("\n", 1);
-                }else if(line=="JUMP"){
+                
+                // * Lógica do JUMP
+                } else if (line == "JUMP"){
+                    // Pula uma linha
                     i++;
-                    string aux = DecimalToBinary(stoi(code[i])-comments[stoi(code[i])]-1);
+                    // #
+                    string aux = DecimalToBinary(stoi(code[i]) - comments[stoi(code[i])] - 1);
+                    // #
                     assembly.write((aux.c_str()), aux.length());
+                    // #
                     assembly.write("\n", 1);
                 }
             }
+
+            // * Tratamento de função inexistente
+            // Caso não exista no dicionário
             else
             {
+                // Imprima a mensagem de erro
                 cout << "Unknow input at line " << i << " " << line << endl;
                 return 0;
             }
         }
+
+        // * Transformação dos números decimais do código-fonte em binário para a leitura do processador
+        // Caso não seja uma instrução (é um número)
         else
         {
-            string aux = DecimalToBinary(stoi(line));
+            string aux = DecimalToBinary(stoi(line)); // String que recebe o representativo binário do número decimal escrito
+            // A função stoi faz a transformação de um número decimal tipo string para seu tipo int
+            // Escreve na saída os números em formato de vetor de char e o tamanho do vetor#
             assembly.write((aux.c_str()), aux.length());
+            // #
             assembly.write("\n", 1);
         }
     }
+
+
+    // Finaliza o código transcrito
     assembly.write("11111111", 8);
+
+    // Fecha os arquivos
     sourcecode.close();
     dictinst.close();
     assembly.close();
