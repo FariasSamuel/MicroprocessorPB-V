@@ -10,6 +10,7 @@ integer file,code,t;
   reg [7:0]reader;//register used to read the bytecode 
   reg [7:0] memoria[1023:0]; 
   reg enable_clk = 1;
+  reg start = 0;
   reg clk;
   wire fusion_enable = enable & enable_clk;
   reg [7:0] line = 8'b0;
@@ -31,9 +32,10 @@ integer file,code,t;
         assign enable_clk = 0;
         $finish;
     end else begin
-        
         reader = instrucoes[line];
+        
         //#5$display("%b",reader);
+        if(start)begin
         case(reader)
             8'b00000010:
             begin
@@ -117,8 +119,12 @@ integer file,code,t;
                 line = 8'b11111110;
             end
         endcase
-        line = line + 8'b1;
-
-        end
+        end else begin
+      if(reader == 8'b01111110)begin
+        start = 1;
+      end
+    end
+    line = line + 8'b1;
+    end
     end
 endmodule
